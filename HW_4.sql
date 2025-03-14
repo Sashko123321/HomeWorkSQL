@@ -1,30 +1,63 @@
-use CUSTOMER_ORDER_DB_STUDY
-
-SELECT [OperationTime], s.[Name] AS StoreName
-FROM [Order] o
-JOIN [Shop] s ON o.[ShopId] = s.[Id]
-WHERE o.[OperationTime] > '2025-03-01';
+create database AcademyDB
+use AcademyDB
 
 
-SELECT p.[Title] AS ProductName, p.[Price], m.[Name] AS ManufacturerName FROM [Product] p
-JOIN [Manufacturer] m ON p.[ManufacturerId] = m.[Id]
-WHERE p.[Price] < 8.00;
+CREATE TABLE Curators (
+    Id INT PRIMARY KEY IDENTITY,
+    Name VARCHAR(MAX) NOT NULL,
+    Surname VARCHAR(MAX) NOT NULL
+);
+
+CREATE TABLE Faculties (
+    Id INT PRIMARY KEY IDENTITY,
+    Financing MONEY NOT NULL DEFAULT 0,
+    Name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE Departments (
+    Id INT PRIMARY KEY IDENTITY,
+    Financing MONEY NOT NULL DEFAULT 0,
+    Name VARCHAR(100) NOT NULL UNIQUE,
+    FacultyId INT FOREIGN KEY REFERENCES Faculties(Id)
+);
+
+CREATE TABLE Groups (
+    Id INT PRIMARY KEY IDENTITY,
+    Name VARCHAR(10) NOT NULL UNIQUE,
+    Year INT NOT NULL,
+    DepartmentId INT FOREIGN KEY REFERENCES Departments(Id)
+);
+
+CREATE TABLE GroupsCurators (
+    Id INT PRIMARY KEY IDENTITY,
+    CuratorId INT FOREIGN KEY REFERENCES Curators(Id),
+    GroupId INT FOREIGN KEY REFERENCES Groups(Id)
+);
+
+CREATE TABLE Lectures (
+    Id INT PRIMARY KEY IDENTITY,
+    LectureRoom VARCHAR(MAX) NOT NULL,
+    SubjectId INT FOREIGN KEY REFERENCES Subjects(Id),
+    TeacherId INT FOREIGN KEY REFERENCES Teachers(Id)
+);
+
+CREATE TABLE GroupsLectures (
+    Id INT PRIMARY KEY IDENTITY,
+    GroupId INT FOREIGN KEY REFERENCES Groups(Id),
+    LectureId INT FOREIGN KEY REFERENCES Lectures(Id)
+);
+
+CREATE TABLE Subjects (
+    Id INT PRIMARY KEY IDENTITY,
+    Name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE Teachers (
+    Id INT PRIMARY KEY IDENTITY,
+    Name VARCHAR(MAX) NOT NULL,
+    Salary MONEY NOT NULL,
+    Surname VARCHAR(MAX) NOT NULL
+);
 
 
-SELECT per.[Name] AS CustomerFirstName, per.[LastName], c.[Discount], con.[ContactValue] AS Email FROM [Customer] c
-JOIN [Person] per ON c.[PersonId] = per.[Id]
-JOIN [PersonContact] con ON per.[Id] = con.[PersonId]
-JOIN [ContactType] ct ON con.[ContactTypeId] = ct.[Id]
-WHERE c.[Discount] > 10 AND ct.[Name] = 'email'
-ORDER BY per.[Name];
 
-
-
-
-SELECT p.[Title] AS ProductName, pc.[Name] AS ProductCategory, ci.[Name] AS CityName FROM [Product] p
-JOIN [ProductCategory] pc ON p.[CategoryId] = pc.[Id]
-JOIN [Shop] s ON p.[Id] = s.[Id]
-JOIN [Street] st ON s.[StreetId] = st.[Id]
-JOIN [City] ci ON st.[CityId] = ci.[Id]
-WHERE ci.[Name] LIKE 'K%'
-ORDER BY p.[Title], ci.[Name];
